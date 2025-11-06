@@ -1,25 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Alert,
+  Container,
+  useTheme as useMUITheme,
+  alpha,
+  Fade,
+} from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { styled } from '@mui/material/styles';
+
+const LoadingCard = styled(Box)(({ theme }) => ({
+  padding: '48px',
+  borderRadius: '24px',
+  background: theme.palette.mode === 'dark'
+    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
+  backdropFilter: 'blur(20px)',
+  border: theme.palette.mode === 'dark'
+    ? '1px solid rgba(255, 255, 255, 0.1)'
+    : '1px solid rgba(255, 255, 255, 0.8)',
+  boxShadow: theme.palette.mode === 'dark'
+    ? '0 20px 60px rgba(0, 0, 0, 0.5)'
+    : '0 20px 60px rgba(0, 0, 0, 0.1)',
+  textAlign: 'center',
+}));
 
 const AuthCallbackPage = () => {
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const theme = useMUITheme();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // ... (All your existing logic for params, state, verifier is the same)
         const params = new URLSearchParams(location.search);
         const code = params.get('code');
         const state = params.get('state');
         const verifier = localStorage.getItem('pkce_code_verifier');
         const savedState = sessionStorage.getItem('oauth_state');
         const savedNonce = sessionStorage.getItem('oauth_nonce');
-        
-        // Clear storage *after* validation
+
         if (!state || !savedState || state !== savedState) {
           localStorage.removeItem('pkce_code_verifier');
           sessionStorage.removeItem('oauth_state');
@@ -27,10 +57,9 @@ const AuthCallbackPage = () => {
           throw new Error('Invalid state. Login CSRF attack suspected.');
         }
 
-        // Now we can clear them
         localStorage.removeItem('pkce_code_verifier');
         sessionStorage.removeItem('oauth_state');
-        
+
         if (!code || !verifier) {
           throw new Error('Missing code or verifier.');
         }
@@ -39,7 +68,7 @@ const AuthCallbackPage = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce }),
-          credentials: 'include'
+          credentials: 'include',
         });
 
         if (!res.ok) {
@@ -48,25 +77,18 @@ const AuthCallbackPage = () => {
         }
 
         const data = await res.json();
-        login(data.accessToken); 
-        
-        // --- THIS IS THE NEW PART ---
-        
-        // 1. Check if we saved a location *before* logging in
+        login(data.accessToken);
+
         const targetLocation = sessionStorage.getItem('preLoginLocation');
-        
-        // 2. Clear that item so we don't use it again
         sessionStorage.removeItem('preLoginLocation');
 
-        // 3. Navigate to the target location, or default to /profile
-        navigate(targetLocation || '/profile');
-        
-        // --- END NEW PART ---
-
+        setTimeout(() => {
+          navigate(targetLocation || '/profile');
+        }, 1000);
       } catch (err) {
         console.error(err);
         setError(err.message);
-        // Clean up on error
+        setLoading(false);
         localStorage.removeItem('pkce_code_verifier');
         sessionStorage.removeItem('oauth_state');
         sessionStorage.removeItem('preLoginLocation');
@@ -76,28 +98,98 @@ const AuthCallbackPage = () => {
 
     if (!location.search.includes('processed')) {
       handleAuthCallback();
-      // Add a dummy param to prevent re-run
       navigate(location.pathname + location.search + '&processed=true', { replace: true });
     }
-
   }, [location, navigate, login]);
 
-  // ... (Your JSX render logic is the same)
   if (error) {
     return (
-      <div>
-        <h2>Authentication Failed</h2>
-        <p style={{ color: 'red' }}>{error}</p>
-        <button onClick={() => navigate('/')}>Go to Login</button>
-      </div>
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            minHeight: '60vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Fade in timeout={600}>
+            <LoadingCard>
+              <ErrorIcon
+                sx={{
+                  fontSize: 64,
+                  color: 'error.main',
+                  mb: 3,
+                }}
+              />
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+                Authentication Failed
+              </Typography>
+              <Alert
+                severity="error"
+                sx={{
+                  mb: 3,
+                  borderRadius: 2,
+                  textAlign: 'left',
+                }}
+              >
+                {error}
+              </Alert>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 3 }}
+              >
+                Please try logging in again.
+              </Typography>
+            </LoadingCard>
+          </Fade>
+        </Box>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <h2>Authenticating...</h2>
-      <p>Please wait while we log you in.</p>
-    </div>
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          minHeight: '60vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Fade in timeout={600}>
+          <LoadingCard>
+            <CircularProgress
+              size={64}
+              sx={{
+                color: theme.palette.primary.main,
+                mb: 3,
+              }}
+            />
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                mb: 1,
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)'
+                  : 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              Authenticating...
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Please wait while we log you in securely.
+            </Typography>
+          </LoadingCard>
+        </Fade>
+      </Box>
+    </Container>
   );
 };
 
