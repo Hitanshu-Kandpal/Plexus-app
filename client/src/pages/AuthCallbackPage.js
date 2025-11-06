@@ -46,30 +46,56 @@ const AuthCallbackPage = () => {
         const params = new URLSearchParams(location.search);
         const code = params.get('code');
         const state = params.get('state');
-        const verifier = localStorage.getItem('pkce_code_verifier');
+        
+        // Get provider from sessionStorage (set during login initiation)
+        const provider = sessionStorage.getItem('oauth_provider') || 'google';
         const savedState = sessionStorage.getItem('oauth_state');
         const savedNonce = sessionStorage.getItem('oauth_nonce');
 
+        // Validate state (CSRF protection)
         if (!state || !savedState || state !== savedState) {
           localStorage.removeItem('pkce_code_verifier');
           sessionStorage.removeItem('oauth_state');
           sessionStorage.removeItem('oauth_nonce');
+          sessionStorage.removeItem('oauth_provider');
           throw new Error('Invalid state. Login CSRF attack suspected.');
         }
 
-        localStorage.removeItem('pkce_code_verifier');
+        // Clear state after validation
         sessionStorage.removeItem('oauth_state');
+        sessionStorage.removeItem('oauth_provider');
 
-        if (!code || !verifier) {
-          throw new Error('Missing code or verifier.');
+        if (!code) {
+          throw new Error('Missing authorization code.');
         }
 
-        const res = await fetch('http://localhost:5000/auth/google', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce }),
-          credentials: 'include',
-        });
+        let res;
+        
+        if (provider === 'google') {
+          // Google OAuth with PKCE
+          const verifier = localStorage.getItem('pkce_code_verifier');
+          if (!verifier) {
+            throw new Error('Missing PKCE verifier.');
+          }
+          localStorage.removeItem('pkce_code_verifier');
+
+          res = await fetch('http://localhost:5000/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce }),
+            credentials: 'include',
+          });
+        } else if (provider === 'facebook') {
+          // Facebook OAuth (no PKCE, uses state + nonce)
+          res = await fetch('http://localhost:5000/auth/facebook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code, state: state, nonce: savedNonce }),
+            credentials: 'include',
+          });
+        } else {
+          throw new Error('Unknown OAuth provider.');
+        }
 
         if (!res.ok) {
           const errorData = await res.json();
@@ -81,6 +107,7 @@ const AuthCallbackPage = () => {
 
         const targetLocation = sessionStorage.getItem('preLoginLocation');
         sessionStorage.removeItem('preLoginLocation');
+        sessionStorage.removeItem('oauth_nonce');
 
         setTimeout(() => {
           navigate(targetLocation || '/profile');
@@ -91,8 +118,9 @@ const AuthCallbackPage = () => {
         setLoading(false);
         localStorage.removeItem('pkce_code_verifier');
         sessionStorage.removeItem('oauth_state');
-        sessionStorage.removeItem('preLoginLocation');
         sessionStorage.removeItem('oauth_nonce');
+        sessionStorage.removeItem('oauth_provider');
+        sessionStorage.removeItem('preLoginLocation');
       }
     };
 

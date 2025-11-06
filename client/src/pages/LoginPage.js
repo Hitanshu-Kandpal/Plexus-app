@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPkceChallenge, generateState, generateNonce } from '../pkceHelper';
 import { useTheme } from '../context/ThemeContext';
 import {
@@ -12,6 +13,7 @@ import {
   Grow,
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
 import { styled } from '@mui/material/styles';
 
 const GlassCard = styled(Box)(({ theme }) => ({
@@ -134,6 +136,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mode } = useTheme();
   const theme = useMUITheme();
+  const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
     try {
@@ -145,6 +148,7 @@ const LoginPage = () => {
       localStorage.setItem('pkce_code_verifier', verifier);
       sessionStorage.setItem('oauth_state', state);
       sessionStorage.setItem('oauth_nonce', nonce);
+      sessionStorage.setItem('oauth_provider', 'google'); // Track provider
 
       const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
       const REDIRECT_URI = 'http://localhost:3000/auth/callback';
@@ -167,6 +171,11 @@ const LoginPage = () => {
       console.error('Error during Google login', err);
       setIsLoading(false);
     }
+  };
+
+  const handleFacebookLogin = async () => {
+    // Redirect to Facebook unavailable page instead of actual OAuth
+    navigate('/facebook-unavailable');
   };
 
   return (
@@ -231,7 +240,7 @@ const LoginPage = () => {
                   </Typography>
                 </Box>
 
-                <Box sx={{ mt: 5 }}>
+                <Box sx={{ mt: 5, display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <GradientButton
                     fullWidth
                     variant="contained"
@@ -245,6 +254,29 @@ const LoginPage = () => {
                     }}
                   >
                     {isLoading ? 'Connecting...' : 'Continue with Google'}
+                  </GradientButton>
+
+                  <GradientButton
+                    fullWidth
+                    variant="contained"
+                    startIcon={<FacebookIcon sx={{ fontSize: 24 }} />}
+                    onClick={handleFacebookLogin}
+                    disabled={isLoading}
+                    sx={{
+                      background: theme.palette.mode === 'dark'
+                        ? 'linear-gradient(135deg, #1877f2 0%, #42a5f5 100%)'
+                        : 'linear-gradient(135deg, #1877f2 0%, #42a5f5 100%)',
+                      '&:hover': {
+                        background: theme.palette.mode === 'dark'
+                          ? 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)'
+                          : 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+                      },
+                      '& .MuiButton-startIcon': {
+                        marginRight: 1.5,
+                      },
+                    }}
+                  >
+                    {isLoading ? 'Connecting...' : 'Continue with Facebook'}
                   </GradientButton>
                 </Box>
 

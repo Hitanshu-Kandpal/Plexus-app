@@ -19,6 +19,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import FacebookUnavailablePage from './pages/FacebookUnavailablePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -87,8 +88,8 @@ const Navbar = () => {
   const theme = useMUITheme();
   const location = useLocation();
 
-  // Don't show navbar on login page
-  if (location.pathname === '/' && !accessToken) {
+  // Don't show navbar on login page or Facebook unavailable page
+  if ((location.pathname === '/' || location.pathname === '/facebook-unavailable') && !accessToken) {
     return null;
   }
 
@@ -174,6 +175,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/facebook-unavailable" element={<FacebookUnavailablePage />} />
             <Route
               path="/profile"
               element={

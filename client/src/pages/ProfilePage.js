@@ -25,6 +25,16 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import ShieldIcon from '@mui/icons-material/Shield';
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const StatCard = styled(Card)(({ theme }) => ({
@@ -99,6 +109,8 @@ const ProfilePage = () => {
   const { user, setUser, setCsrfToken, csrfToken, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unlinkDialog, setUnlinkDialog] = useState({ open: false, provider: null });
+  const [unlinking, setUnlinking] = useState(false);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const theme = useMUITheme();
@@ -156,6 +168,34 @@ const ProfilePage = () => {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const handleUnlinkProvider = async () => {
+    if (!unlinkDialog.provider) return;
+
+    try {
+      setUnlinking(true);
+      const res = await axiosPrivate.post(
+        '/api/user/unlink-provider',
+        { provider: unlinkDialog.provider },
+        { headers: { 'CSRF-Token': csrfToken } }
+      );
+
+      // Refresh user data
+      const userRes = await axiosPrivate.get('/api/user/me');
+      setUser(userRes.data);
+      setCsrfToken(userRes.data.csrfToken);
+
+      setUnlinkDialog({ open: false, provider: null });
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to unlink provider.');
+    } finally {
+      setUnlinking(false);
+    }
+  };
+
+  const hasGoogle = user?.providers?.googleId;
+  const hasFacebook = user?.providers?.facebookId;
 
   if (loading) {
     return (
@@ -269,6 +309,98 @@ const ProfilePage = () => {
 
                   <Divider sx={{ my: 3 }} />
 
+                  {/* Linked Providers Section */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                      Linked Accounts
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: 2,
+                          borderRadius: 2,
+                          background: theme.palette.mode === 'dark'
+                            ? alpha(theme.palette.primary.main, 0.1)
+                            : alpha(theme.palette.primary.main, 0.05),
+                          border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <GoogleIcon sx={{ fontSize: 28, color: '#4285f4' }} />
+                          <Box>
+                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                              Google
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {hasGoogle ? 'Connected' : 'Not connected'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        {hasGoogle && (
+                          <IconButton
+                            size="small"
+                            onClick={() => setUnlinkDialog({ open: true, provider: 'google' })}
+                            disabled={!hasFacebook} // Can't unlink if it's the only provider
+                            sx={{
+                              color: 'error.main',
+                              '&:disabled': {
+                                opacity: 0.5,
+                              },
+                            }}
+                          >
+                            <LinkOffIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: 2,
+                          borderRadius: 2,
+                          background: theme.palette.mode === 'dark'
+                            ? alpha(theme.palette.secondary.main, 0.1)
+                            : alpha(theme.palette.secondary.main, 0.05),
+                          border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <FacebookIcon sx={{ fontSize: 28, color: '#1877f2' }} />
+                          <Box>
+                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                              Facebook
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {hasFacebook ? 'Connected' : 'Not connected'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        {hasFacebook && (
+                          <IconButton
+                            size="small"
+                            onClick={() => setUnlinkDialog({ open: true, provider: 'facebook' })}
+                            disabled={!hasGoogle} // Can't unlink if it's the only provider
+                            sx={{
+                              color: 'error.main',
+                              '&:disabled': {
+                                opacity: 0.5,
+                              },
+                            }}
+                          >
+                            <LinkOffIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Divider sx={{ my: 3 }} />
+
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {user.role === 'admin' && (
                       <ActionButton
@@ -373,7 +505,53 @@ const ProfilePage = () => {
     );
   }
 
-  return <Typography>Please log in.</Typography>;
+  return (
+    <>
+      <Typography>Please log in.</Typography>
+
+      {/* Unlink Provider Confirmation Dialog */}
+      <Dialog
+        open={unlinkDialog.open}
+        onClose={() => setUnlinkDialog({ open: false, provider: null })}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
+            backdropFilter: 'blur(20px)',
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          Unlink {unlinkDialog.provider === 'google' ? 'Google' : 'Facebook'} Account?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to unlink your {unlinkDialog.provider === 'google' ? 'Google' : 'Facebook'} account?
+            You'll need to link it again if you want to use it for login in the future.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            onClick={() => setUnlinkDialog({ open: false, provider: null })}
+            disabled={unlinking}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUnlinkProvider}
+            variant="contained"
+            color="error"
+            disabled={unlinking}
+            startIcon={unlinking ? <CircularProgress size={16} /> : <LinkOffIcon />}
+          >
+            {unlinking ? 'Unlinking...' : 'Unlink'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 };
 
 export default ProfilePage;
