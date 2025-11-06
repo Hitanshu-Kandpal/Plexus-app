@@ -1,0 +1,12 @@
+{
+  "name": "plexus-app",
+  "version": "1.0.0",
+  "description": "PLEXUS MERN OAuth2 Social Login System",
+  "scripts": {
+    "build": "cd client && npm install && npm run build"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
+

@@ -143,7 +143,7 @@ const LoginPage = () => {
       sessionStorage.setItem('oauth_provider', 'google');
 
       const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-      const REDIRECT_URI = 'http://localhost:3000/auth/callback';
+      const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? `${window.location.origin}/auth/callback` : 'http://localhost:3000/auth/callback');
       const SCOPE = 'profile email';
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +

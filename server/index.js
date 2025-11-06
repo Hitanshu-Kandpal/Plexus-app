@@ -19,7 +19,9 @@ const PORT = process.env.PORT || 5000;
 
 // --- Middlewares ---
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: process.env.FRONTEND_URL 
+    ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+    : ['http://localhost:3000'],
   credentials: true 
 }));
 app.use(morgan('dev'));
@@ -325,7 +327,8 @@ app.post('/api/recommendations', protect, async (req, res) => {
       return res.status(401).json({ error: 'User not authenticated' });
     }
     // Forward to recommender backend
-    const resp = await axios.post('http://localhost:4000/api/recommend', req.body, {
+    const recommenderUrl = process.env.RECOMMENDER_API_URL || 'http://localhost:4000';
+    const resp = await axios.post(`${recommenderUrl}/api/recommend`, req.body, {
       headers: { 'x-user-id': userId }
     });
     return res.json(resp.data);
