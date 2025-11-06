@@ -22,22 +22,22 @@ export const ThemeProvider = ({ children }) => {
         palette: {
           mode,
           primary: {
-            main: mode === 'dark' ? '#6366f1' : '#4f46e5',
-            light: mode === 'dark' ? '#818cf8' : '#6366f1',
-            dark: mode === 'dark' ? '#4f46e5' : '#4338ca',
+            main: mode === 'dark' ? '#00ffff' : '#00aaff',
+            light: mode === 'dark' ? '#00ffff' : '#00ccff',
+            dark: mode === 'dark' ? '#00cccc' : '#0088cc',
           },
           secondary: {
-            main: mode === 'dark' ? '#ec4899' : '#db2777',
-            light: mode === 'dark' ? '#f472b6' : '#ec4899',
-            dark: mode === 'dark' ? '#db2777' : '#be185d',
+            main: mode === 'dark' ? '#ff0080' : '#ff0066',
+            light: mode === 'dark' ? '#ff3399' : '#ff3388',
+            dark: mode === 'dark' ? '#cc0066' : '#cc0055',
           },
           background: {
-            default: mode === 'dark' ? '#0f172a' : '#f8fafc',
-            paper: mode === 'dark' ? '#1e293b' : '#ffffff',
+            default: mode === 'dark' ? '#0a0a1a' : '#f5f7fa',
+            paper: mode === 'dark' ? '#1a1a2a' : '#ffffff',
           },
           text: {
-            primary: mode === 'dark' ? '#f1f5f9' : '#0f172a',
-            secondary: mode === 'dark' ? '#cbd5e1' : '#475569',
+            primary: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+            secondary: mode === 'dark' ? '#00ffff' : '#0066cc',
           },
         },
         typography: {

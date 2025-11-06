@@ -35,73 +35,134 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
+
+const neonGlow = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 255, 255, 0.5),
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.8),
+      0 0 40px rgba(255, 0, 128, 0.5),
+      inset 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+`;
+
+const neonGlowLight = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 170, 255, 0.3),
+      0 0 20px rgba(0, 170, 255, 0.2),
+      inset 0 0 10px rgba(0, 170, 255, 0.05);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 170, 255, 0.5),
+      0 0 40px rgba(204, 0, 102, 0.3),
+      inset 0 0 20px rgba(0, 170, 255, 0.1);
+  }
+`;
 
 const StatCard = styled(Card)(({ theme }) => ({
   position: 'relative',
   padding: '24px',
-  borderRadius: '20px',
+  borderRadius: '16px',
   background: theme.palette.mode === 'dark'
-    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`
-    : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+    ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.98) 100%)',
+  backdropFilter: 'blur(20px) saturate(180%)',
   border: theme.palette.mode === 'dark'
-    ? `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-    : `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-  transition: 'all 0.3s ease',
+    ? '2px solid rgba(0, 255, 255, 0.5)'
+    : '2px solid rgba(0, 170, 255, 0.4)',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  animation: theme.palette.mode === 'dark'
+    ? `${neonGlow} 3s ease-in-out infinite`
+    : `${neonGlowLight} 3s ease-in-out infinite`,
   '&:hover': {
-    transform: 'translateY(-4px)',
+    transform: 'translateY(-8px) scale(1.02)',
     boxShadow: theme.palette.mode === 'dark'
-      ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.3)}`
-      : `0 12px 40px ${alpha(theme.palette.primary.main, 0.2)}`,
+      ? '0 20px 60px rgba(0, 255, 255, 0.5), 0 0 0 2px rgba(0, 255, 255, 0.3)'
+      : '0 20px 60px rgba(0, 170, 255, 0.3), 0 0 0 2px rgba(0, 170, 255, 0.2)',
   },
 }));
 
 const ProfileCard = styled(Card)(({ theme }) => ({
   position: 'relative',
-  borderRadius: '24px',
+  borderRadius: '16px',
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-  backdropFilter: 'blur(20px)',
+    ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.98) 100%)',
+  backdropFilter: 'blur(20px) saturate(180%)',
   border: theme.palette.mode === 'dark'
-    ? '1px solid rgba(255, 255, 255, 0.1)'
-    : '1px solid rgba(255, 255, 255, 0.8)',
+    ? '2px solid rgba(0, 255, 255, 0.5)'
+    : '2px solid rgba(0, 170, 255, 0.4)',
   overflow: 'hidden',
+  animation: theme.palette.mode === 'dark'
+    ? `${neonGlow} 3s ease-in-out infinite`
+    : `${neonGlowLight} 3s ease-in-out infinite`,
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
+    height: '3px',
     background: theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899)'
-      : 'linear-gradient(90deg, #4f46e5, #7c3aed, #db2777)',
+      ? 'linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.8), rgba(255, 0, 128, 0.8), transparent)'
+      : 'linear-gradient(90deg, transparent, rgba(0, 170, 255, 0.6), rgba(204, 0, 102, 0.6), transparent)',
   },
 }));
+
+const avatarPulse = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.9), 0 0 60px rgba(255, 0, 128, 0.6);
+  }
+`;
 
 const GradientAvatar = styled(Avatar)(({ theme }) => ({
   width: 120,
   height: 120,
-  background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
-    : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%)',
+  background: 'linear-gradient(135deg, #00ffff 0%, #ff0080 100%)',
   fontSize: '48px',
   fontWeight: 700,
-  boxShadow: theme.palette.mode === 'dark'
-    ? '0 8px 32px rgba(99, 102, 241, 0.4)'
-    : '0 8px 32px rgba(79, 70, 229, 0.3)',
-  border: `4px solid ${theme.palette.background.paper}`,
+  fontFamily: "'Courier New', monospace",
+  color: '#ffffff',
+  animation: `${avatarPulse} 2s ease-in-out infinite`,
+  border: '4px solid rgba(0, 255, 255, 0.6)',
+  boxShadow: '0 8px 32px rgba(0, 255, 255, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.2)',
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
-  padding: '12px 24px',
-  borderRadius: '12px',
-  fontWeight: 600,
-  textTransform: 'none',
-  transition: 'all 0.3s ease',
+  padding: '14px 28px',
+  borderRadius: '8px',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.15em',
+  fontFamily: "'Courier New', monospace",
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  background: theme.palette.mode === 'dark'
+    ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 255, 255, 0.1) 100%)'
+    : 'linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 170, 255, 0.15) 100%)',
+  border: theme.palette.mode === 'dark'
+    ? '2px solid rgba(0, 255, 255, 0.6)'
+    : '2px solid rgba(0, 170, 255, 0.5)',
+  color: theme.palette.mode === 'dark' ? '#ffffff' : '#0066cc',
   '&:hover': {
-    transform: 'translateY(-2px)',
+    transform: 'translateY(-4px)',
+    background: theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(0, 170, 255, 0.35) 0%, rgba(0, 170, 255, 0.25) 100%)',
+    boxShadow: theme.palette.mode === 'dark'
+      ? '0 10px 30px rgba(0, 255, 255, 0.6), 0 0 0 3px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.4)'
+      : '0 10px 30px rgba(0, 170, 255, 0.4), 0 0 0 3px rgba(0, 170, 255, 0.2), 0 0 40px rgba(0, 170, 255, 0.3)',
+    borderColor: theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.9)' : 'rgba(0, 170, 255, 0.7)',
   },
 }));
 
@@ -114,6 +175,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const theme = useMUITheme();
+  const { mode } = useTheme();
 
   useEffect(() => {
     let isMounted = true;
@@ -266,12 +328,14 @@ const ProfilePage = () => {
                         sx={{
                           fontWeight: 700,
                           mb: 1,
-                          background: theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)'
-                            : 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          backgroundClip: 'text',
+                          fontSize: { xs: '24px', sm: '32px' },
+                          color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                          textShadow: mode === 'dark'
+                            ? '0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.4)'
+                            : '0 0 15px rgba(0, 170, 255, 0.6), 0 0 30px rgba(0, 170, 255, 0.3)',
+                          fontFamily: "'Courier New', monospace",
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.1em',
                         }}
                       >
                         {user.name}
@@ -285,34 +349,61 @@ const ProfilePage = () => {
                           mb: 2,
                         }}
                       >
-                        <EmailIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                        <Typography variant="body1" color="text.secondary">
+                        <EmailIcon sx={{ fontSize: 18, color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />
+                        <Typography 
+                          variant="body1" 
+                          sx={{ 
+                            color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                            fontFamily: "'Courier New', monospace",
+                            fontWeight: 500,
+                          }}
+                        >
                           {user.email}
                         </Typography>
                       </Box>
                       <Chip
-                        icon={<ShieldIcon />}
+                        icon={<ShieldIcon sx={{ color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />}
                         label={user.role.toUpperCase()}
-                        color={user.role === 'admin' ? 'primary' : 'default'}
                         sx={{
-                          fontWeight: 600,
-                          px: 1,
+                          fontWeight: 700,
+                          px: 1.5,
+                          py: 0.5,
+                          fontSize: '12px',
+                          fontFamily: "'Courier New', monospace",
+                          letterSpacing: '0.1em',
                           background: user.role === 'admin'
-                            ? theme.palette.mode === 'dark'
-                              ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3))'
-                              : 'linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(124, 58, 237, 0.2))'
-                            : undefined,
+                            ? mode === 'dark'
+                              ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 128, 0.3))'
+                              : 'linear-gradient(135deg, rgba(0, 170, 255, 0.25), rgba(204, 0, 102, 0.25))'
+                            : mode === 'dark'
+                              ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1))'
+                              : 'linear-gradient(135deg, rgba(0, 170, 255, 0.15), rgba(0, 170, 255, 0.1))',
+                          color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                          border: mode === 'dark' ? '1px solid rgba(0, 255, 255, 0.5)' : '1px solid rgba(0, 170, 255, 0.4)',
+                          textShadow: mode === 'dark' ? '0 0 10px rgba(0, 255, 255, 0.8)' : 'none',
                         }}
                       />
                     </Box>
                   </Box>
 
-                  <Divider sx={{ my: 3 }} />
+                  <Divider sx={{ my: 3, borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(0, 170, 255, 0.2)' }} />
 
                   {/* Linked Providers Section */}
                   <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                      Linked Accounts
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        mb: 2,
+                        fontSize: '18px',
+                        color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                        textShadow: mode === 'dark' ? '0 0 15px rgba(0, 255, 255, 0.8)' : 'none',
+                        fontFamily: "'Courier New', monospace",
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.15em',
+                      }}
+                    >
+                      LINKED ACCOUNTS
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                       <Box
@@ -322,19 +413,38 @@ const ProfilePage = () => {
                           justifyContent: 'space-between',
                           p: 2,
                           borderRadius: 2,
-                          background: theme.palette.mode === 'dark'
-                            ? alpha(theme.palette.primary.main, 0.1)
-                            : alpha(theme.palette.primary.main, 0.05),
-                          border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                          background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.8) 0%, rgba(10, 10, 26, 0.9) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 247, 250, 0.95) 100%)',
+                          border: mode === 'dark' ? '2px solid rgba(0, 255, 255, 0.4)' : '2px solid rgba(0, 170, 255, 0.3)',
+                          backdropFilter: 'blur(10px)',
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <GoogleIcon sx={{ fontSize: 28, color: '#4285f4' }} />
                           <Box>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            <Typography 
+                              variant="body1" 
+                              sx={{ 
+                                fontWeight: 700,
+                                color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                                fontFamily: "'Courier New', monospace",
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                              }}
+                            >
                               Google
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography 
+                              variant="caption" 
+                              sx={{
+                                color: hasGoogle 
+                                  ? (mode === 'dark' ? '#00ffff' : '#0066cc')
+                                  : (mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(26, 26, 42, 0.6)'),
+                                fontFamily: "'Courier New', monospace",
+                                fontWeight: 600,
+                              }}
+                            >
                               {hasGoogle ? 'Connected' : 'Not connected'}
                             </Typography>
                           </Box>
@@ -363,19 +473,38 @@ const ProfilePage = () => {
                           justifyContent: 'space-between',
                           p: 2,
                           borderRadius: 2,
-                          background: theme.palette.mode === 'dark'
-                            ? alpha(theme.palette.secondary.main, 0.1)
-                            : alpha(theme.palette.secondary.main, 0.05),
-                          border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+                          background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.8) 0%, rgba(10, 10, 26, 0.9) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 247, 250, 0.95) 100%)',
+                          border: mode === 'dark' ? '2px solid rgba(255, 0, 128, 0.4)' : '2px solid rgba(204, 0, 102, 0.3)',
+                          backdropFilter: 'blur(10px)',
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <FacebookIcon sx={{ fontSize: 28, color: '#1877f2' }} />
                           <Box>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            <Typography 
+                              variant="body1" 
+                              sx={{ 
+                                fontWeight: 700,
+                                color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                                fontFamily: "'Courier New', monospace",
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                              }}
+                            >
                               Facebook
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography 
+                              variant="caption" 
+                              sx={{
+                                color: hasFacebook 
+                                  ? (mode === 'dark' ? '#ff0080' : '#cc0066')
+                                  : (mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(26, 26, 42, 0.6)'),
+                                fontFamily: "'Courier New', monospace",
+                                fontWeight: 600,
+                              }}
+                            >
                               {hasFacebook ? 'Connected' : 'Not connected'}
                             </Typography>
                           </Box>
@@ -399,7 +528,7 @@ const ProfilePage = () => {
                     </Box>
                   </Box>
 
-                  <Divider sx={{ my: 3 }} />
+                  <Divider sx={{ my: 3, borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(0, 170, 255, 0.2)' }} />
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {user.role === 'admin' && (
@@ -409,30 +538,39 @@ const ProfilePage = () => {
                         component={RouterLink}
                         to="/admin"
                         sx={{
-                          background: theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
-                            : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                          color: '#ffffff',
+                          background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(255, 0, 128, 0.2) 100%)'
+                            : 'linear-gradient(135deg, rgba(0, 170, 255, 0.3) 0%, rgba(204, 0, 102, 0.2) 100%)',
+                          borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.6)' : 'rgba(0, 170, 255, 0.5)',
+                          color: mode === 'dark' ? '#ffffff' : '#0066cc',
                         }}
                       >
-                        Admin Dashboard
+                        ADMIN DASHBOARD
                       </ActionButton>
                     )}
 
                     <ActionButton
                       variant="outlined"
-                      color="error"
                       startIcon={<LogoutIcon />}
                       onClick={handleLogout}
                       sx={{
-                        borderColor: theme.palette.error.main,
+                        background: mode === 'dark'
+                          ? 'linear-gradient(135deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.15) 100%)'
+                          : 'linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%)',
+                        borderColor: mode === 'dark' ? 'rgba(255, 0, 0, 0.6)' : 'rgba(220, 38, 38, 0.5)',
+                        color: mode === 'dark' ? '#ffffff' : '#dc2626',
                         '&:hover': {
-                          borderColor: theme.palette.error.dark,
-                          background: alpha(theme.palette.error.main, 0.1),
+                          background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(255, 0, 0, 0.4) 0%, rgba(255, 0, 0, 0.3) 100%)'
+                            : 'linear-gradient(135deg, rgba(220, 38, 38, 0.35) 0%, rgba(220, 38, 38, 0.25) 100%)',
+                          boxShadow: mode === 'dark'
+                            ? '0 10px 30px rgba(255, 0, 0, 0.6), 0 0 0 3px rgba(255, 0, 0, 0.3), 0 0 40px rgba(255, 0, 0, 0.4)'
+                            : '0 10px 30px rgba(220, 38, 38, 0.4), 0 0 0 3px rgba(220, 38, 38, 0.2), 0 0 40px rgba(220, 38, 38, 0.3)',
+                          borderColor: mode === 'dark' ? 'rgba(255, 0, 0, 0.9)' : 'rgba(220, 38, 38, 0.7)',
                         },
                       }}
                     >
-                      Sign Out
+                      SIGN OUT
                     </ActionButton>
                   </Box>
                 </CardContent>
@@ -443,27 +581,43 @@ const ProfilePage = () => {
             <Grid item xs={12} md={4}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <StatCard>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box
                       sx={{
                         width: 56,
                         height: 56,
-                        borderRadius: '16px',
-                        background: theme.palette.mode === 'dark'
-                          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.3)}, ${alpha(theme.palette.secondary.main, 0.2)})`
-                          : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+                        borderRadius: '12px',
+                        background: mode === 'dark'
+                          ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1))'
+                          : 'linear-gradient(135deg, rgba(0, 170, 255, 0.15), rgba(0, 170, 255, 0.1))',
+                        border: mode === 'dark' ? '2px solid rgba(0, 255, 255, 0.4)' : '2px solid rgba(0, 170, 255, 0.3)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <PersonIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                      <PersonIcon sx={{ fontSize: 28, color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />
                     </Box>
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      <Typography 
+                        variant="h5" 
+                        sx={{ 
+                          fontWeight: 700,
+                          color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                          fontFamily: "'Courier New', monospace",
+                          textTransform: 'uppercase',
+                        }}
+                      >
                         Active
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography 
+                        variant="body2" 
+                        sx={{
+                          color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                          fontFamily: "'Courier New', monospace",
+                          fontWeight: 600,
+                        }}
+                      >
                         Account Status
                       </Typography>
                     </Box>
@@ -471,27 +625,43 @@ const ProfilePage = () => {
                 </StatCard>
 
                 <StatCard>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box
                       sx={{
                         width: 56,
                         height: 56,
-                        borderRadius: '16px',
-                        background: theme.palette.mode === 'dark'
-                          ? `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.3)}, ${alpha(theme.palette.primary.main, 0.2)})`
-                          : `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.15)}, ${alpha(theme.palette.primary.main, 0.1)})`,
+                        borderRadius: '12px',
+                        background: mode === 'dark'
+                          ? 'linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(255, 0, 128, 0.1))'
+                          : 'linear-gradient(135deg, rgba(204, 0, 102, 0.15), rgba(204, 0, 102, 0.1))',
+                        border: mode === 'dark' ? '2px solid rgba(255, 0, 128, 0.4)' : '2px solid rgba(204, 0, 102, 0.3)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <ShieldIcon sx={{ fontSize: 28, color: 'secondary.main' }} />
+                      <ShieldIcon sx={{ fontSize: 28, color: mode === 'dark' ? '#ff0080' : '#cc0066' }} />
                     </Box>
                     <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      <Typography 
+                        variant="h5" 
+                        sx={{ 
+                          fontWeight: 700,
+                          color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                          fontFamily: "'Courier New', monospace",
+                          textTransform: 'uppercase',
+                        }}
+                      >
                         {user.role === 'admin' ? 'Admin' : 'User'}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography 
+                        variant="body2" 
+                        sx={{
+                          color: mode === 'dark' ? '#ff0080' : '#cc0066',
+                          fontFamily: "'Courier New', monospace",
+                          fontWeight: 600,
+                        }}
+                      >
                         Access Level
                       </Typography>
                     </Box>

@@ -24,72 +24,115 @@ import {
 import PersonIcon from '@mui/icons-material/Person';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import PeopleIcon from '@mui/icons-material/People';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
+
+const neonGlow = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 255, 255, 0.5),
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.8),
+      0 0 40px rgba(255, 0, 128, 0.5),
+      inset 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+`;
+
+const neonGlowLight = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 170, 255, 0.3),
+      0 0 20px rgba(0, 170, 255, 0.2),
+      inset 0 0 10px rgba(0, 170, 255, 0.05);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 170, 255, 0.5),
+      0 0 40px rgba(204, 0, 102, 0.3),
+      inset 0 0 20px rgba(0, 170, 255, 0.1);
+  }
+`;
 
 const AdminCard = styled(Card)(({ theme }) => ({
-  borderRadius: '24px',
+  borderRadius: '16px',
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-  backdropFilter: 'blur(20px)',
+    ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.98) 100%)',
+  backdropFilter: 'blur(20px) saturate(180%)',
   border: theme.palette.mode === 'dark'
-    ? '1px solid rgba(255, 255, 255, 0.1)'
-    : '1px solid rgba(255, 255, 255, 0.8)',
+    ? '2px solid rgba(0, 255, 255, 0.5)'
+    : '2px solid rgba(0, 170, 255, 0.4)',
   boxShadow: theme.palette.mode === 'dark'
-    ? '0 20px 60px rgba(0, 0, 0, 0.5)'
-    : '0 20px 60px rgba(0, 0, 0, 0.1)',
+    ? '0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.2), inset 0 0 60px rgba(0, 255, 255, 0.05)'
+    : '0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 170, 255, 0.15), inset 0 0 60px rgba(0, 170, 255, 0.03)',
   overflow: 'hidden',
+  animation: theme.palette.mode === 'dark'
+    ? `${neonGlow} 3s ease-in-out infinite`
+    : `${neonGlowLight} 3s ease-in-out infinite`,
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
+    height: '3px',
     background: theme.palette.mode === 'dark'
-      ? 'linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899)'
-      : 'linear-gradient(90deg, #4f46e5, #7c3aed, #db2777)',
+      ? 'linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.8), rgba(255, 0, 128, 0.8), transparent)'
+      : 'linear-gradient(90deg, transparent, rgba(0, 170, 255, 0.6), rgba(204, 0, 102, 0.6), transparent)',
   },
 }));
 
 const StatBox = styled(Box)(({ theme }) => ({
   padding: '24px',
-  borderRadius: '20px',
+  borderRadius: '16px',
   background: theme.palette.mode === 'dark'
-    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`
-    : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+    ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.98) 100%)',
+  backdropFilter: 'blur(20px) saturate(180%)',
   border: theme.palette.mode === 'dark'
-    ? `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-    : `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+    ? '2px solid rgba(0, 255, 255, 0.5)'
+    : '2px solid rgba(0, 170, 255, 0.4)',
   textAlign: 'center',
-  transition: 'all 0.3s ease',
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  animation: theme.palette.mode === 'dark'
+    ? `${neonGlow} 3s ease-in-out infinite`
+    : `${neonGlowLight} 3s ease-in-out infinite`,
   '&:hover': {
-    transform: 'translateY(-4px)',
+    transform: 'translateY(-8px) scale(1.02)',
     boxShadow: theme.palette.mode === 'dark'
-      ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.3)}`
-      : `0 12px 40px ${alpha(theme.palette.primary.main, 0.2)}`,
+      ? '0 20px 60px rgba(0, 255, 255, 0.5), 0 0 0 2px rgba(0, 255, 255, 0.3)'
+      : '0 20px 60px rgba(0, 170, 255, 0.3), 0 0 0 2px rgba(0, 170, 255, 0.2)',
   },
 }));
 
 const UserListItem = styled(ListItem)(({ theme, isAdmin }) => ({
-  borderRadius: '16px',
+  borderRadius: '12px',
   marginBottom: '8px',
-  background: theme.palette.mode === 'dark'
-    ? isAdmin
-      ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.05)})`
-      : 'rgba(30, 41, 59, 0.5)'
-    : isAdmin
-      ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.secondary.main, 0.03)})`
-      : 'rgba(255, 255, 255, 0.5)',
-  border: theme.palette.mode === 'dark'
-    ? `1px solid ${alpha(theme.palette.primary.main, isAdmin ? 0.2 : 0.1)}`
-    : `1px solid ${alpha(theme.palette.primary.main, isAdmin ? 0.15 : 0.08)}`,
+  background: isAdmin
+    ? theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.8) 0%, rgba(10, 10, 26, 0.9) 100%)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 247, 250, 0.95) 100%)'
+    : theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.6) 0%, rgba(10, 10, 26, 0.7) 100%)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(245, 247, 250, 0.9) 100%)',
+  border: isAdmin
+    ? theme.palette.mode === 'dark'
+      ? '2px solid rgba(0, 255, 255, 0.4)'
+      : '2px solid rgba(0, 170, 255, 0.3)'
+    : theme.palette.mode === 'dark'
+      ? '2px solid rgba(0, 255, 255, 0.2)'
+      : '2px solid rgba(0, 170, 255, 0.15)',
+  backdropFilter: 'blur(10px)',
   transition: 'all 0.3s ease',
   '&:hover': {
     transform: 'translateX(8px)',
     boxShadow: theme.palette.mode === 'dark'
-      ? `0 8px 24px ${alpha(theme.palette.primary.main, 0.2)}`
-      : `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+      ? '0 8px 24px rgba(0, 255, 255, 0.3)'
+      : '0 8px 24px rgba(0, 170, 255, 0.2)',
+    borderColor: theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.6)' : 'rgba(0, 170, 255, 0.5)',
   },
 }));
 
@@ -98,18 +141,29 @@ const UserAvatar = styled(Avatar)(({ theme, isAdmin }) => ({
   height: 56,
   background: isAdmin
     ? theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
-      : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%)'
+      ? 'linear-gradient(135deg, #00ffff 0%, #ff0080 100%)'
+      : 'linear-gradient(135deg, #0066cc 0%, #cc0066 100%)'
     : theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #475569 0%, #64748b 100%)'
-      : 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)',
+      ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(0, 170, 255, 0.25) 0%, rgba(0, 170, 255, 0.2) 100%)',
   fontSize: '24px',
   fontWeight: 600,
+  color: '#ffffff',
+  fontFamily: "'Courier New', monospace",
+  border: isAdmin
+    ? theme.palette.mode === 'dark'
+      ? '2px solid rgba(0, 255, 255, 0.6)'
+      : '2px solid rgba(0, 170, 255, 0.5)'
+    : theme.palette.mode === 'dark'
+      ? '2px solid rgba(0, 255, 255, 0.3)'
+      : '2px solid rgba(0, 170, 255, 0.25)',
   boxShadow: isAdmin
     ? theme.palette.mode === 'dark'
-      ? '0 4px 16px rgba(99, 102, 241, 0.4)'
-      : '0 4px 16px rgba(79, 70, 229, 0.3)'
-    : 'none',
+      ? '0 4px 16px rgba(0, 255, 255, 0.5)'
+      : '0 4px 16px rgba(0, 170, 255, 0.4)'
+    : theme.palette.mode === 'dark'
+      ? '0 4px 16px rgba(0, 255, 255, 0.2)'
+      : '0 4px 16px rgba(0, 170, 255, 0.15)',
 }));
 
 const AdminPage = () => {
@@ -118,6 +172,7 @@ const AdminPage = () => {
   const [error, setError] = useState(null);
   const axiosPrivate = useAxiosPrivate();
   const theme = useMUITheme();
+  const { mode } = useTheme();
 
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -200,55 +255,111 @@ const AdminPage = () => {
             sx={{
               fontWeight: 800,
               mb: 1,
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              fontSize: { xs: '32px', sm: '48px' },
+              color: theme.palette.mode === 'dark' ? '#ffffff' : '#1a1a2a',
+              textShadow: theme.palette.mode === 'dark'
+                ? '0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.4)'
+                : '0 0 15px rgba(0, 170, 255, 0.6), 0 0 30px rgba(0, 170, 255, 0.3)',
+              fontFamily: "'Courier New', monospace",
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
             }}
           >
-            Admin Dashboard
+            ADMIN DASHBOARD
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ fontSize: '17px' }}>
-            Manage and monitor all registered users in the system
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontSize: '17px',
+              color: theme.palette.mode === 'dark' ? '#00ffff' : '#0066cc',
+              fontFamily: "'Courier New', monospace",
+              letterSpacing: '0.1em',
+              fontWeight: 600,
+            }}
+          >
+            MANAGE AND MONITOR ALL REGISTERED USERS IN THE SYSTEM
           </Typography>
         </Box>
 
         {/* Stats */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={4}>
-            <StatBox>
-              <PeopleIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-                {users.length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Total Users
-              </Typography>
-            </StatBox>
+              <StatBox>
+                <PeopleIcon sx={{ fontSize: 40, color: mode === 'dark' ? '#00ffff' : '#0066cc', mb: 1 }} />
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.5,
+                    color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                    fontFamily: "'Courier New', monospace",
+                  }}
+                >
+                  {users.length}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                    fontFamily: "'Courier New', monospace",
+                    fontWeight: 600,
+                  }}
+                >
+                  Total Users
+                </Typography>
+              </StatBox>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <StatBox>
-              <AdminPanelSettingsIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-                {adminCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Administrators
-              </Typography>
-            </StatBox>
+              <StatBox>
+                <AdminPanelSettingsIcon sx={{ fontSize: 40, color: mode === 'dark' ? '#00ffff' : '#0066cc', mb: 1 }} />
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.5,
+                    color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                    fontFamily: "'Courier New', monospace",
+                  }}
+                >
+                  {adminCount}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                    fontFamily: "'Courier New', monospace",
+                    fontWeight: 600,
+                  }}
+                >
+                  Administrators
+                </Typography>
+              </StatBox>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <StatBox>
-              <PersonIcon sx={{ fontSize: 40, color: 'secondary.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-                {userCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Regular Users
-              </Typography>
-            </StatBox>
+              <StatBox>
+                <PersonIcon sx={{ fontSize: 40, color: mode === 'dark' ? '#ff0080' : '#cc0066', mb: 1 }} />
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.5,
+                    color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                    fontFamily: "'Courier New', monospace",
+                  }}
+                >
+                  {userCount}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    color: mode === 'dark' ? '#ff0080' : '#cc0066',
+                    fontFamily: "'Courier New', monospace",
+                    fontWeight: 600,
+                  }}
+                >
+                  Regular Users
+                </Typography>
+              </StatBox>
           </Grid>
         </Grid>
 
@@ -263,10 +374,16 @@ const AdminPage = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
+                fontSize: '24px',
+                color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                textShadow: mode === 'dark' ? '0 0 15px rgba(0, 255, 255, 0.8)' : 'none',
+                fontFamily: "'Courier New', monospace",
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
               }}
             >
-              <PeopleIcon sx={{ fontSize: 28 }} />
-              All Users
+              <PeopleIcon sx={{ fontSize: 28, mr: 1 }} />
+              ALL USERS
             </Typography>
 
             <List sx={{ p: 0 }}>
@@ -287,22 +404,36 @@ const AdminPage = () => {
                       <ListItemText
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ 
+                                fontWeight: 700,
+                                color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                                fontFamily: "'Courier New', monospace",
+                                textTransform: 'uppercase',
+                              }}
+                            >
                               {user.name}
                             </Typography>
                             <Chip
                               label={user.role.toUpperCase()}
                               size="small"
-                              color={isAdmin ? 'primary' : 'default'}
                               sx={{
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 height: 24,
                                 fontSize: '11px',
+                                fontFamily: "'Courier New', monospace",
+                                letterSpacing: '0.1em',
                                 background: isAdmin
-                                  ? theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3))'
-                                    : 'linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(124, 58, 237, 0.2))'
-                                  : undefined,
+                                  ? mode === 'dark'
+                                    ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 128, 0.3))'
+                                    : 'linear-gradient(135deg, rgba(0, 170, 255, 0.25), rgba(204, 0, 102, 0.25))'
+                                  : mode === 'dark'
+                                    ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1))'
+                                    : 'linear-gradient(135deg, rgba(0, 170, 255, 0.15), rgba(0, 170, 255, 0.1))',
+                                color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                                border: mode === 'dark' ? '1px solid rgba(0, 255, 255, 0.5)' : '1px solid rgba(0, 170, 255, 0.4)',
+                                textShadow: mode === 'dark' ? '0 0 10px rgba(0, 255, 255, 0.8)' : 'none',
                               }}
                             />
                           </Box>
@@ -312,15 +443,24 @@ const AdminPage = () => {
                             <Typography
                               component="span"
                               variant="body2"
-                              color="text.primary"
-                              sx={{ display: 'block', mb: 0.5 }}
+                              sx={{ 
+                                display: 'block', 
+                                mb: 0.5,
+                                color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                                fontFamily: "'Courier New', monospace",
+                                fontWeight: 500,
+                              }}
                             >
                               {user.email}
                             </Typography>
                             <Typography
                               component="span"
                               variant="caption"
-                              color="text.secondary"
+                              sx={{
+                                color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                                fontFamily: "'Courier New', monospace",
+                                fontWeight: 600,
+                              }}
                             >
                               Joined: {new Date(user.createdAt).toLocaleDateString('en-US', {
                                 year: 'numeric',
@@ -332,11 +472,11 @@ const AdminPage = () => {
                         }
                       />
                     </UserListItem>
-                    {index < users.length - 1 && (
+                      {index < users.length - 1 && (
                       <Divider
                         sx={{
                           my: 1,
-                          opacity: theme.palette.mode === 'dark' ? 0.1 : 0.2,
+                          borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(0, 170, 255, 0.2)',
                         }}
                       />
                     )}

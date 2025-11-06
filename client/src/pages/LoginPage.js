@@ -14,53 +14,88 @@ import {
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
 
-const GlassCard = styled(Box)(({ theme }) => ({
+const neonGlow = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 255, 255, 0.5),
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.8),
+      0 0 40px rgba(255, 0, 128, 0.5),
+      inset 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+`;
+
+const neonGlowLight = keyframes`
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(0, 170, 255, 0.4),
+      0 0 20px rgba(0, 170, 255, 0.2),
+      inset 0 0 10px rgba(0, 170, 255, 0.05);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(0, 170, 255, 0.6),
+      0 0 40px rgba(204, 0, 102, 0.3),
+      inset 0 0 20px rgba(0, 170, 255, 0.1);
+  }
+`;
+
+const CyberCard = styled(Box)(({ theme }) => ({
   position: 'relative',
-  padding: '48px 40px',
-  borderRadius: '32px',
+  padding: '56px 48px',
+  borderRadius: '16px',
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+    ? 'linear-gradient(135deg, rgba(26, 26, 42, 0.9) 0%, rgba(10, 10, 26, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.98) 100%)',
   backdropFilter: 'blur(20px) saturate(180%)',
   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
   border: theme.palette.mode === 'dark'
-    ? '1px solid rgba(255, 255, 255, 0.1)'
-    : '1px solid rgba(255, 255, 255, 0.8)',
+    ? '2px solid rgba(0, 255, 255, 0.5)'
+    : '2px solid rgba(0, 170, 255, 0.4)',
   boxShadow: theme.palette.mode === 'dark'
-    ? '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
-    : '0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+    ? '0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.2), inset 0 0 60px rgba(0, 255, 255, 0.05)'
+    : '0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 170, 255, 0.15), inset 0 0 60px rgba(0, 170, 255, 0.03)',
   overflow: 'hidden',
+  animation: theme.palette.mode === 'dark' 
+    ? `${neonGlow} 3s ease-in-out infinite`
+    : `${neonGlowLight} 3s ease-in-out infinite`,
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #6366f1)',
-    backgroundSize: '200% 100%',
-    animation: 'shimmer 3s linear infinite',
+    height: '3px',
+    background: theme.palette.mode === 'dark'
+      ? 'linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.8), rgba(255, 0, 128, 0.8), transparent)'
+      : 'linear-gradient(90deg, transparent, rgba(0, 170, 255, 0.6), rgba(204, 0, 102, 0.6), transparent)',
   },
 }));
 
-const GradientButton = styled(Button)(({ theme }) => ({
+const NeonButton = styled(Button)(({ theme }) => ({
   position: 'relative',
-  padding: '16px 32px',
+  padding: '18px 36px',
   fontSize: '16px',
-  fontWeight: 600,
-  borderRadius: '14px',
+  fontWeight: 700,
+  borderRadius: '8px',
   background: theme.palette.mode === 'dark'
-    ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'
-    : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%)',
-  backgroundSize: '200% 200%',
-  color: '#ffffff',
-  boxShadow: theme.palette.mode === 'dark'
-    ? '0 8px 24px rgba(99, 102, 241, 0.4), 0 0 0 0 rgba(99, 102, 241, 0)'
-    : '0 8px 24px rgba(79, 70, 229, 0.3), 0 0 0 0 rgba(79, 70, 229, 0)',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 255, 255, 0.1) 100%)'
+    : 'linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 170, 255, 0.15) 100%)',
+  color: theme.palette.mode === 'dark' ? '#ffffff' : '#0066cc',
+  border: theme.palette.mode === 'dark'
+    ? '2px solid rgba(0, 255, 255, 0.6)'
+    : '2px solid rgba(0, 170, 255, 0.5)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.15em',
+  fontFamily: "'Courier New', monospace",
   overflow: 'hidden',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -72,63 +107,20 @@ const GradientButton = styled(Button)(({ theme }) => ({
     transition: 'left 0.5s',
   },
   '&:hover': {
-    transform: 'translateY(-4px) scale(1.02)',
+    transform: 'translateY(-4px)',
+    background: theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(0, 170, 255, 0.35) 0%, rgba(0, 170, 255, 0.25) 100%)',
     boxShadow: theme.palette.mode === 'dark'
-      ? '0 12px 32px rgba(99, 102, 241, 0.5), 0 0 0 4px rgba(99, 102, 241, 0.1)'
-      : '0 12px 32px rgba(79, 70, 229, 0.4), 0 0 0 4px rgba(79, 70, 229, 0.1)',
-    backgroundPosition: '100% 50%',
+      ? '0 10px 30px rgba(0, 255, 255, 0.6), 0 0 0 3px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.4)'
+      : '0 10px 30px rgba(0, 170, 255, 0.4), 0 0 0 3px rgba(0, 170, 255, 0.2), 0 0 40px rgba(0, 170, 255, 0.3)',
+    borderColor: theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.9)' : 'rgba(0, 170, 255, 0.7)',
     '&::before': {
       left: '100%',
     },
   },
   '&:active': {
-    transform: 'translateY(-2px) scale(1)',
-  },
-}));
-
-const BackgroundGradient = styled(Box)(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  zIndex: -1,
-  background: theme.palette.mode === 'dark'
-    ? 'radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.1) 0%, transparent 50%), #0f172a'
-    : 'radial-gradient(ellipse at top, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.05) 0%, transparent 50%), #f8fafc',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '-50%',
-    left: '-50%',
-    width: '200%',
-    height: '200%',
-    background: theme.palette.mode === 'dark'
-      ? 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)'
-      : 'radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%)',
-    animation: 'pulse 8s ease-in-out infinite',
-  },
-}));
-
-const FloatingShape = styled(Box)(({ theme, delay }) => ({
-  position: 'absolute',
-  borderRadius: '50%',
-  background: theme.palette.mode === 'dark'
-    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.2)})`
-    : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
-  filter: 'blur(40px)',
-  animation: `float 20s ease-in-out infinite`,
-  animationDelay: `${delay}s`,
-  '@keyframes float': {
-    '0%, 100%': {
-      transform: 'translate(0, 0) scale(1)',
-    },
-    '33%': {
-      transform: 'translate(30px, -30px) scale(1.1)',
-    },
-    '66%': {
-      transform: 'translate(-20px, 20px) scale(0.9)',
-    },
+    transform: 'translateY(-2px)',
   },
 }));
 
@@ -148,7 +140,7 @@ const LoginPage = () => {
       localStorage.setItem('pkce_code_verifier', verifier);
       sessionStorage.setItem('oauth_state', state);
       sessionStorage.setItem('oauth_nonce', nonce);
-      sessionStorage.setItem('oauth_provider', 'google'); // Track provider
+      sessionStorage.setItem('oauth_provider', 'google');
 
       const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
       const REDIRECT_URI = 'http://localhost:3000/auth/callback';
@@ -174,74 +166,61 @@ const LoginPage = () => {
   };
 
   const handleFacebookLogin = async () => {
-    // Redirect to Facebook unavailable page instead of actual OAuth
     navigate('/facebook-unavailable');
   };
 
   return (
-    <>
-      <BackgroundGradient>
-        <FloatingShape
-          sx={{ width: 300, height: 300, top: '10%', left: '10%' }}
-          delay={0}
-        />
-        <FloatingShape
-          sx={{ width: 200, height: 200, top: '60%', right: '15%' }}
-          delay={5}
-        />
-        <FloatingShape
-          sx={{ width: 250, height: 250, bottom: '10%', left: '20%' }}
-          delay={10}
-        />
-      </BackgroundGradient>
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        zIndex: 1,
+        py: 4,
+      }}
+    >
+      <Fade in timeout={1000}>
+        <Box sx={{ width: '100%' }}>
+          <Grow in timeout={1500}>
+            <CyberCard>
+              <Box sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 800,
+                    mb: 2,
+                    letterSpacing: '0.1em',
+                    fontSize: { xs: '32px', sm: '48px' },
+                    color: mode === 'dark' ? '#ffffff' : '#1a1a2a',
+                    textShadow: mode === 'dark'
+                      ? '0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.4)'
+                      : '0 0 15px rgba(0, 170, 255, 0.6), 0 0 30px rgba(0, 170, 255, 0.3)',
+                    fontFamily: "'Courier New', monospace",
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Welcome
+                </Typography>
 
-      <Container
-        maxWidth="sm"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          zIndex: 1,
-          py: 4,
-        }}
-      >
-        <Fade in timeout={800}>
-          <Box sx={{ width: '100%' }}>
-            <Grow in timeout={1000}>
-              <GlassCard className="fade-in">
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      fontWeight: 800,
-                      background: theme.palette.mode === 'dark'
-                        ? 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)'
-                        : 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      mb: 2,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    Welcome Back
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-                      fontSize: '17px',
-                      fontWeight: 400,
-                    }}
-                  >
-                    Sign in to continue to your account
-                  </Typography>
-                </Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: '18px',
+                    mb: 5,
+                    color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                    fontFamily: "'Courier New', monospace",
+                    letterSpacing: '0.1em',
+                    fontWeight: 600,
+                  }}
+                >
+                  Initialize Connection
+                </Typography>
 
-                <Box sx={{ mt: 5, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <GradientButton
+                <Box sx={{ mt: 5, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  <NeonButton
                     fullWidth
                     variant="contained"
                     startIcon={<GoogleIcon sx={{ fontSize: 24 }} />}
@@ -253,10 +232,10 @@ const LoginPage = () => {
                       },
                     }}
                   >
-                    {isLoading ? 'Connecting...' : 'Continue with Google'}
-                  </GradientButton>
+                    {isLoading ? 'Connecting...' : 'Connect with Google'}
+                  </NeonButton>
 
-                  <GradientButton
+                  <NeonButton
                     fullWidth
                     variant="contained"
                     startIcon={<FacebookIcon sx={{ fontSize: 24 }} />}
@@ -264,47 +243,55 @@ const LoginPage = () => {
                     disabled={isLoading}
                     sx={{
                       background: theme.palette.mode === 'dark'
-                        ? 'linear-gradient(135deg, #1877f2 0%, #42a5f5 100%)'
-                        : 'linear-gradient(135deg, #1877f2 0%, #42a5f5 100%)',
+                        ? 'linear-gradient(135deg, rgba(255, 0, 128, 0.15) 0%, rgba(255, 0, 128, 0.1) 100%)'
+                        : 'linear-gradient(135deg, rgba(204, 0, 102, 0.2) 0%, rgba(204, 0, 102, 0.15) 100%)',
+                      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 0, 128, 0.6)' : 'rgba(204, 0, 102, 0.5)',
+                      color: theme.palette.mode === 'dark' ? '#ffffff' : '#cc0066',
                       '&:hover': {
                         background: theme.palette.mode === 'dark'
-                          ? 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)'
-                          : 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+                          ? 'linear-gradient(135deg, rgba(255, 0, 128, 0.3) 0%, rgba(255, 0, 128, 0.2) 100%)'
+                          : 'linear-gradient(135deg, rgba(204, 0, 102, 0.35) 0%, rgba(204, 0, 102, 0.25) 100%)',
+                        boxShadow: theme.palette.mode === 'dark'
+                          ? '0 10px 30px rgba(255, 0, 128, 0.6), 0 0 0 3px rgba(255, 0, 128, 0.3), 0 0 40px rgba(255, 0, 128, 0.4)'
+                          : '0 10px 30px rgba(204, 0, 102, 0.4), 0 0 0 3px rgba(204, 0, 102, 0.2), 0 0 40px rgba(204, 0, 102, 0.3)',
+                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 0, 128, 0.9)' : 'rgba(204, 0, 102, 0.7)',
                       },
                       '& .MuiButton-startIcon': {
                         marginRight: 1.5,
                       },
                     }}
                   >
-                    {isLoading ? 'Connecting...' : 'Continue with Facebook'}
-                  </GradientButton>
+                    {isLoading ? 'Connecting...' : 'Connect with Facebook'}
+                  </NeonButton>
                 </Box>
 
                 <Box
                   sx={{
                     mt: 4,
                     pt: 3,
-                    borderTop: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+                    borderTop: mode === 'dark' ? '2px solid rgba(0, 255, 255, 0.3)' : '2px solid rgba(0, 170, 255, 0.2)',
                   }}
                 >
                   <Typography
                     variant="caption"
                     sx={{
-                      color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-                      fontSize: '13px',
+                      color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(26, 26, 42, 0.6)',
+                      fontSize: '12px',
                       display: 'block',
                       textAlign: 'center',
+                      fontFamily: "'Courier New', monospace",
+                      letterSpacing: '0.15em',
                     }}
                   >
-                    Secure authentication powered by OAuth 2.0
+                    Secure Authentication Protocol v2.0
                   </Typography>
                 </Box>
-              </GlassCard>
-            </Grow>
-          </Box>
-        </Fade>
-      </Container>
-    </>
+              </Box>
+            </CyberCard>
+          </Grow>
+        </Box>
+      </Fade>
+    </Container>
   );
 };
 
