@@ -28,6 +28,11 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import MovieIcon from '@mui/icons-material/Movie';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {
   Dialog,
   DialogTitle,
@@ -571,6 +576,96 @@ const ProfilePage = () => {
                       }}
                     >
                       SIGN OUT
+                    </ActionButton>
+                  </Box>
+
+                  <Divider sx={{ my: 3, borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(0, 170, 255, 0.2)' }} />
+
+                  {/* Secret App Section */}
+                  <Box
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      background: mode === 'dark'
+                        ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 128, 0.1) 100%)'
+                        : 'linear-gradient(135deg, rgba(0, 170, 255, 0.08) 0%, rgba(204, 0, 102, 0.08) 100%)',
+                      border: mode === 'dark' ? '2px solid rgba(0, 255, 255, 0.4)' : '2px solid rgba(0, 170, 255, 0.3)',
+                      backdropFilter: 'blur(10px)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <AutoAwesomeIcon sx={{ fontSize: 32, color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 700,
+                          color: mode === 'dark' ? '#00ffff' : '#0066cc',
+                          fontFamily: "'Courier New', monospace",
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.1em',
+                          textShadow: mode === 'dark' ? '0 0 15px rgba(0, 255, 255, 0.8)' : 'none',
+                        }}
+                      >
+                        Your Secret App
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : '#1a1a2a',
+                        mb: 3,
+                        lineHeight: 1.8,
+                        fontFamily: "'Courier New', monospace",
+                      }}
+                    >
+                      Discover personalized recommendations powered by AI. Search for movies, music, and books to get curated suggestions tailored just for you. Our intelligent system learns your preferences and delivers insights that match your taste.
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <MovieIcon sx={{ fontSize: 20, color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />
+                        <Typography variant="body2" sx={{ fontFamily: "'Courier New', monospace", color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : '#1a1a2a' }}>
+                          Movies
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <MusicNoteIcon sx={{ fontSize: 20, color: mode === 'dark' ? '#ff0080' : '#cc0066' }} />
+                        <Typography variant="body2" sx={{ fontFamily: "'Courier New', monospace", color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : '#1a1a2a' }}>
+                          Music
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <MenuBookIcon sx={{ fontSize: 20, color: mode === 'dark' ? '#00ffff' : '#0066cc' }} />
+                        <Typography variant="body2" sx={{ fontFamily: "'Courier New', monospace", color: mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : '#1a1a2a' }}>
+                          Books
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <ActionButton
+                      variant="contained"
+                      fullWidth
+                      startIcon={<RocketLaunchIcon />}
+                      component={RouterLink}
+                      to="/recommendations"
+                      sx={{
+                        py: 2,
+                        fontSize: '16px',
+                        background: mode === 'dark'
+                          ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(255, 0, 128, 0.3) 100%)'
+                          : 'linear-gradient(135deg, rgba(0, 170, 255, 0.3) 0%, rgba(204, 0, 102, 0.3) 100%)',
+                        borderColor: mode === 'dark' ? 'rgba(0, 255, 255, 0.8)' : 'rgba(0, 170, 255, 0.7)',
+                        color: mode === 'dark' ? '#ffffff' : '#ffffff',
+                        '&:hover': {
+                          background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(0, 255, 255, 0.5) 0%, rgba(255, 0, 128, 0.5) 100%)'
+                            : 'linear-gradient(135deg, rgba(0, 170, 255, 0.5) 0%, rgba(204, 0, 102, 0.5) 100%)',
+                          transform: 'translateY(-4px) scale(1.02)',
+                          boxShadow: mode === 'dark'
+                            ? '0 15px 40px rgba(0, 255, 255, 0.6), 0 0 0 3px rgba(0, 255, 255, 0.4), 0 0 60px rgba(255, 0, 128, 0.5)'
+                            : '0 15px 40px rgba(0, 170, 255, 0.5), 0 0 0 3px rgba(0, 170, 255, 0.3), 0 0 60px rgba(204, 0, 102, 0.4)',
+                        },
+                      }}
+                    >
+                      OPEN YOUR SECRET APP
                     </ActionButton>
                   </Box>
                 </CardContent>

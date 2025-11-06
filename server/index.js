@@ -314,6 +314,31 @@ app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
 });
 
 // ===================================
+// ===   RECOMMENDATIONS ROUTE      ===
+// ===================================
+// Proxy route for secure personalized recommendations
+// Placed before CSRF middleware since it uses JWT auth
+app.post('/api/recommendations', protect, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    // Forward to recommender backend
+    const resp = await axios.post('http://localhost:4000/api/recommend', req.body, {
+      headers: { 'x-user-id': userId }
+    });
+    return res.json(resp.data);
+  } catch (err) {
+    console.error('Rec API error:', err?.response?.data || err.message);
+    res.status(500).json({ 
+      error: 'Recommendation service failure.',
+      details: err?.response?.data || err.message 
+    });
+  }
+});
+
+// ===================================
 // ===   CSRF & PROTECTED ROUTES   ===
 // ===================================
 // We initialize CSRF protection *after* our auth routes

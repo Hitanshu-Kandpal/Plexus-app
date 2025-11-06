@@ -26,6 +26,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { styled } from '@mui/material/styles';
+import RecommendationsPage from './pages/RecommendationsPage';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: theme.palette.mode === 'dark'
@@ -203,6 +204,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/recommendations"
+              element={
+                <ProtectedRoute>
+                  <RecommendationsPage />
                 </ProtectedRoute>
               }
             />
