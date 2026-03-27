@@ -88,7 +88,7 @@ app.post('/auth/google', googleAuthValidation, async (req, res) => {
         code: code,
         code_verifier: verifier,
         grant_type: 'authorization_code',
-        redirect_uri: 'http://localhost:3000/auth/callback',
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback',
       },
     });
 
@@ -157,10 +157,11 @@ app.post('/auth/google', googleAuthValidation, async (req, res) => {
 
     // --- 6. Set the REFRESH token as an httpOnly cookie ---
     // We rename the cookie to 'refreshToken'
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true if on HTTPS
-      sameSite: 'strict',
+      secure: isProd, // Set to true if on HTTPS
+      sameSite: isProd ? 'none' : 'strict', // 'none' required for cross-domain cookies
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days (must match token expiry)
     });
 
@@ -296,10 +297,11 @@ app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
     );
 
     // --- 6. Set the REFRESH token as an httpOnly cookie ---
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true if on HTTPS
-      sameSite: 'strict',
+      secure: isProd, // Set to true if on HTTPS
+      sameSite: isProd ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -433,10 +435,11 @@ app.get('/api/admin/users', protect, admin, async (req, res) => {
 
 // --- 5. The "Logout" Route ---
 app.post('/auth/logout', authLimiter, protect, (req, res) => {
+  const isProd = process.env.NODE_ENV === 'production';
   res.clearCookie('refreshToken', {
     httpOnly: true,
-    secure: false,
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'strict',
   });
   res.status(200).json({ message: 'Logged out successfully' });
 });
