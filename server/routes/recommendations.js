@@ -1,26 +1,13 @@
-require('dotenv').config();
-const dns = require('node:dns');
-dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent ETIMEDOUT on IPv6 addresses
 const express = require('express');
-const cors = require('cors');
 const axios = require('axios');
+const SearchHistory = require('../models/SearchHistory');
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const { createClient } = require('@supabase/supabase-js');
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role key now
-);
+const router = express.Router();
 
 // 🔐 Spotify token caching
 let spotifyToken = null;
 let spotifyTokenExpiry = 0;
 
-// 🧩 Spotify token helper
 async function getSpotifyToken() {
   const now = Date.now();
 
@@ -50,9 +37,6 @@ async function getSpotifyToken() {
   return spotifyToken;
 }
 
-// 🌐 Health check
-app.get('/', (req, res) => res.json({ status: 'Plexus server running' }));
-
 // 🧠 Gemini insight generator
 async function getGeminiInsight(promptText) {
   const GEMINI_KEY = process.env.GEMINI_API_KEY;
@@ -73,13 +57,31 @@ async function getGeminiInsight(promptText) {
   }
 }
 
-// 🎯 MAIN ROUTE
-app.post('/api/recommend', async (req, res) => {
+// 🎯 MAIN ROUTE (Replaces Supabase with MongoDB)
+router.post('/', async (req, res) => {
   try {
     const { category, query } = req.body;
-    const userId = req.headers['x-user-id'];
+    // req.user is set by the `protect` middleware in index.js
+    const userId = req.user?.id; 
+
     if (!category || !query)
       return res.status(400).json({ error: 'category & query required' });
+
+    // Helper to save search history to MongoDB
+    const saveHistory = async (insight) => {
+      if (userId) {
+        try {
+          await SearchHistory.create({
+            user_id: userId,
+            category,
+            query,
+            ai_insight: insight
+          });
+        } catch (err) {
+          console.error("🔥 MongoDB insert error:", err.message);
+        }
+      }
+    };
 
     // 🎬 MOVIES
     if (category === 'movie') {
@@ -87,8 +89,10 @@ app.post('/api/recommend', async (req, res) => {
       const SEARCH_URL = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&include_adult=false`;
 
       const searchRes = await axios.get(SEARCH_URL);
-      if (!searchRes.data.results?.length)
+      if (!searchRes.data.results?.length) {
+        await saveHistory('No movies found.');
         return res.json({ category, query, recommendations: [], aiInsight: 'No movies found.' });
+      }
 
       const movieId = searchRes.data.results[0].id;
       const RECS_URL = `https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`;
@@ -103,19 +107,8 @@ app.post('/api/recommend', async (req, res) => {
       const aiInsight = await getGeminiInsight(
         `Write a 60-word engaging movie insight for "${query}". Mention its storytelling, tone, and what makes it special. Avoid spoilers.`
       );
-      console.log("🧠 Movie save attempt:", { userId, aiInsight });
-      try {
-        if (userId) {
-          await supabase.from("search_history").insert({
-            user_id: userId,
-            category,
-            query,
-            ai_insight: aiInsight
-          });
-        }
-      } catch (err) {
-        console.error("🔥 Supabase movie insert error:", err.message);
-      }
+      
+      await saveHistory(aiInsight);
       return res.json({ category, query, recommendations: recs, aiInsight });
     }
 
@@ -126,8 +119,6 @@ app.post('/api/recommend', async (req, res) => {
         let recs = [];
         let aiInsight = "No AI insight available.";
 
-        console.log("🎵 Searching Spotify for:", query);
-
         // 1️⃣ Try searching for artists
         const artistSearch = await axios.get(
           `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=1`,
@@ -136,30 +127,20 @@ app.post('/api/recommend', async (req, res) => {
 
         const artists = artistSearch.data?.artists?.items || [];
         if (artists.length > 0) {
-          console.log("🎤 Found artist:", artists[0].name);
-
           const artistId = artists[0].id;
-          let relatedRes = null;
           let relatedArtists = [];
-          let relatedFailed = false;
 
           try {
-            relatedRes = await axios.get(
+            const relatedRes = await axios.get(
               `https://api.spotify.com/v1/artists/${artistId}/related-artists`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             relatedArtists = relatedRes.data?.artists || [];
-            if (relatedArtists.length === 0) {
-              console.warn("⚠️ No related artists found for artist:", artists[0].name);
-              relatedFailed = true;
-            }
           } catch (relErr) {
-            const msg = relErr.response?.status === 404 ? "(404)" : "";
-            console.warn(`⚠️ Spotify related-artists fetch failed for ${artists[0].name} ${msg}:`, relErr.response?.data || relErr.message);
-            relatedFailed = true;
+            console.warn(`⚠️ Spotify related-artists fetch failed for ${artists[0].name}`);
           }
 
-          if (!relatedFailed) {
+          if (relatedArtists.length > 0) {
             recs = relatedArtists.slice(0, 8).map(a => ({
               title: a.name,
               image: a.images?.[0]?.url || null,
@@ -169,15 +150,8 @@ app.post('/api/recommend', async (req, res) => {
             aiInsight = await getGeminiInsight(
               `Write a 50-word music insight for artist "${artists[0].name}". Mention their genre, tone, and why listeners enjoy them.`
             );
-            console.log("✅ Returned related artists for:", artists[0].name);
-            if (userId) {
-              await supabase.from('search_history').insert({
-                user_id: userId,
-                category,
-                query,
-                ai_insight: aiInsight
-              });
-            }
+            
+            await saveHistory(aiInsight);
             return res.json({ category, query, recommendations: recs, aiInsight });
           } else {
             // Fallback: get top tracks
@@ -193,42 +167,26 @@ app.post('/api/recommend', async (req, res) => {
                   image: t.album.images?.[0]?.url || null,
                   meta: `${t.artists?.map(a => a.name).join(', ') || ''} | ${t.album?.name || ''}`,
                 }));
-                // FIX: AI insight should be about ARTIST, not the first track
+                
                 aiInsight = await getGeminiInsight(
                   `Write a 50-word music insight for artist "${artists[0].name}". Mention their genre, tone, and why listeners enjoy them.`
                 );
-                console.log("✅ Fallback to top tracks for:", artists[0].name);
-                if (userId) {
-                  await supabase.from('search_history').insert({
-                    user_id: userId,
-                    category,
-                    query,
-                    ai_insight: aiInsight
-                  });
-                }
+                
+                await saveHistory(aiInsight);
                 return res.json({ category, query, recommendations: recs, aiInsight });
-              } else {
-                console.warn("⚠️ No top tracks found for fallback for:", artists[0].name);
               }
             } catch (fallbackErr) {
               console.error("❌ Spotify fallback top-tracks error:", fallbackErr.response?.data || fallbackErr.message);
             }
           }
-          // If everything fails...
-          console.warn("⚠️ Both related-artists and top-tracks failed for:", artists[0].name);
-          if (userId) {
-            await supabase.from('search_history').insert({
-              user_id: userId,
-              category,
-              query,
-              ai_insight: `No related artists or tracks found for artist ${artists[0].name}.`
-            });
-          }
+          
+          const fallbackInsight = `No related artists or tracks found for artist ${artists[0].name}.`;
+          await saveHistory(fallbackInsight);
           return res.json({
             category,
             query,
             recommendations: [],
-            aiInsight: `No related artists or tracks found for artist ${artists[0].name}.`
+            aiInsight: fallbackInsight
           });
         }
 
@@ -240,8 +198,6 @@ app.post('/api/recommend', async (req, res) => {
 
         const tracks = trackSearch.data?.tracks?.items || [];
         if (tracks.length > 0) {
-          console.log(`🎶 Found ${tracks.length} tracks for ${query}`);
-
           recs = tracks.map(t => ({
             title: t.name,
             image: t.album.images?.[0]?.url || null,
@@ -252,34 +208,19 @@ app.post('/api/recommend', async (req, res) => {
             `Write a short (50-75 words) review for the track "${tracks[0].name}" by ${tracks[0].artists.map(a => a.name).join(', ')}. Focus on its mood, sound, and why it appeals to listeners.`
           );
 
-          if (userId) {
-            await supabase.from('search_history').insert({
-              user_id: userId,
-              category,
-              query,
-              ai_insight: aiInsight
-            });
-          }
+          await saveHistory(aiInsight);
           return res.json({ category, query, recommendations: recs, aiInsight });
         }
 
-        console.log("⚠️ No artist or track results for:", query);
-        if (userId) {
-          await supabase.from('search_history').insert({
-            user_id: userId,
-            category,
-            query,
-            ai_insight: 'No songs or artists found for "' + query + '". Try another name.'
-          });
-        }
+        const notFoundMsg = `No songs or artists found for "${query}". Try another name.`;
+        await saveHistory(notFoundMsg);
         return res.json({
           category,
           query,
           recommendations: [],
-          aiInsight: `No songs or artists found for "${query}". Try another name.`,
+          aiInsight: notFoundMsg,
         });
       } catch (musicErr) {
-        console.error("🎧 Spotify API error:", musicErr.response?.data || musicErr.message);
         return res.status(500).json({
           category,
           query,
@@ -290,21 +231,13 @@ app.post('/api/recommend', async (req, res) => {
       }
     }
 
-
     // 📚 BOOKS
     if (category === 'book') {
       const BOOKS_URL = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8`;
       const searchRes = await axios.get(BOOKS_URL);
 
       if (!searchRes.data.items?.length) {
-        if (userId) {
-          await supabase.from('search_history').insert({
-            user_id: userId,
-            category,
-            query,
-            ai_insight: 'No books found.'
-          });
-        }
+        await saveHistory('No books found.');
         return res.json({ category, query, recommendations: [], aiInsight: 'No books found.' });
       }
 
@@ -317,38 +250,24 @@ app.post('/api/recommend', async (req, res) => {
       const aiInsight = await getGeminiInsight(
         `Write a 60-word literary insight for the book "${query}". Describe its themes, tone, and what makes it a must-read (avoid spoilers).`
       );
-      if (userId) {
-        await supabase.from('search_history').insert({
-          user_id: userId,
-          category,
-          query,
-          ai_insight: aiInsight
-        });
-      }
+      
+      await saveHistory(aiInsight);
       return res.json({ category, query, recommendations: recs, aiInsight });
     }
 
     // FALLBACK
-    if (userId) {
-      await supabase.from('search_history').insert({
-        user_id: userId,
-        category,
-        query,
-        ai_insight: `Recommendation logic for ${category} coming soon.`
-      });
-    }
+    const fallbackMsg = `Recommendation logic for ${category} coming soon.`;
+    await saveHistory(fallbackMsg);
     return res.json({
       category,
       query,
       recommendations: [],
-      aiInsight: `Recommendation logic for ${category} coming soon.`,
+      aiInsight: fallbackMsg,
     });
+    
   } catch (err) {
-    console.error('🔥 FULL ERROR DETAILS:', err.response?.data || err.message || err);
     res.status(500).json({ error: 'server error', details: err.response?.data || err.message });
   }
 });
 
-// 🚀 Server setup
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+module.exports = router;

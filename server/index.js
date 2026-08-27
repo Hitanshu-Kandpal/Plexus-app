@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
 dotenv.config(); // Must be at the very top
+const dns = require('node:dns');
+dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent ETIMEDOUT on IPv6 addresses
 
 const express = require('express');
 const cors = require('cors');
@@ -320,28 +322,9 @@ app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
 // ===================================
 // ===   RECOMMENDATIONS ROUTE      ===
 // ===================================
-// Proxy route for secure personalized recommendations
-// Placed before CSRF middleware since it uses JWT auth
-app.post('/api/recommendations', protect, async (req, res) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-    // Forward to recommender backend
-    const recommenderUrl = process.env.RECOMMENDER_API_URL || 'http://localhost:4000';
-    const resp = await axios.post(`${recommenderUrl}/api/recommend`, req.body, {
-      headers: { 'x-user-id': userId }
-    });
-    return res.json(resp.data);
-  } catch (err) {
-    console.error('Rec API error:', err?.response?.data || err.message);
-    res.status(500).json({ 
-      error: 'Recommendation service failure.',
-      details: err?.response?.data || err.message 
-    });
-  }
-});
+// Uses the newly integrated recommendations router (replaces separate server)
+const recommendationsRouter = require('./routes/recommendations');
+app.use('/api/recommendations', protect, recommendationsRouter);
 
 // ===================================
 // ===   CSRF & PROTECTED ROUTES   ===
@@ -496,7 +479,11 @@ app.post('/api/user/unlink-provider', authLimiter, protect, async (req, res) => 
 });
 
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Start the server (or export for serverless)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
