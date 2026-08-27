@@ -1,38 +1,25 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    },
-    {
-      "src": "server/index.js",
-      "use": "@vercel/node"
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server/index"
+      "destination": "/api"
     },
     {
       "source": "/auth/google",
-      "destination": "/server/index"
+      "destination": "/api"
     },
     {
       "source": "/auth/facebook",
-      "destination": "/server/index"
+      "destination": "/api"
     },
     {
       "source": "/auth/refresh",
-      "destination": "/server/index"
+      "destination": "/api"
     },
     {
       "source": "/auth/logout",
-      "destination": "/server/index"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",

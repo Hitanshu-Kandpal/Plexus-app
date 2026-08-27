@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "PLEXUS MERN OAuth2 Social Login System",
   "scripts": {
-    "build": "cd client && npm install && npm run build"
+    "build": "cd client && npm install && npm run build && cd .. && node -e \"const fs = require('fs'); fs.rmSync('build', {recursive:true, force:true}); fs.cpSync('client/build', 'build', {recursive:true});\""
   },
   "engines": {
     "node": "22.x"
