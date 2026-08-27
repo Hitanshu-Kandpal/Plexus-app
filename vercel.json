@@ -16,23 +16,23 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server/index.js"
+      "destination": "/server/index"
     },
     {
       "source": "/auth/google",
-      "destination": "/server/index.js"
+      "destination": "/server/index"
     },
     {
       "source": "/auth/facebook",
-      "destination": "/server/index.js"
+      "destination": "/server/index"
     },
     {
       "source": "/auth/refresh",
-      "destination": "/server/index.js"
+      "destination": "/server/index"
     },
     {
       "source": "/auth/logout",
-      "destination": "/server/index.js"
+      "destination": "/server/index"
     },
     {
       "source": "/(.*)",
