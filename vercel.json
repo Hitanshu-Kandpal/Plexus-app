@@ -19,7 +19,19 @@
       "destination": "/server/index.js"
     },
     {
-      "source": "/auth/(.*)",
+      "source": "/auth/google",
+      "destination": "/server/index.js"
+    },
+    {
+      "source": "/auth/facebook",
+      "destination": "/server/index.js"
+    },
+    {
+      "source": "/auth/refresh",
+      "destination": "/server/index.js"
+    },
+    {
+      "source": "/auth/logout",
       "destination": "/server/index.js"
     },
     {
