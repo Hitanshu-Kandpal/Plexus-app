@@ -29,6 +29,15 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+
+// Vercel routes everything in the api folder to /api/*
+// This middleware strips the /api prefix so our existing routes work seamlessly
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api')) {
+    req.url = req.url.substring(4) || '/';
+  }
+  next();
+});
 // --- Removed passport.initialize() ---
 
 // General rate limiter for most routes
