@@ -83,7 +83,7 @@ const AuthCallbackPage = () => {
           res = await fetch(`${apiUrl}/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce }),
+            body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce, redirectUri: window.location.origin + '/auth/callback' }),
             credentials: 'include',
           });
         } else if (provider === 'facebook') {
@@ -92,7 +92,7 @@ const AuthCallbackPage = () => {
           res = await fetch(`${apiUrl}/auth/facebook`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: code, state: state, nonce: savedNonce }),
+            body: JSON.stringify({ code: code, state: state, nonce: savedNonce, redirectUri: window.location.origin + '/auth/callback' }),
             credentials: 'include',
           });
         } else {

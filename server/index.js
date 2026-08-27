@@ -75,10 +75,10 @@ app.post('/auth/google', googleAuthValidation, async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { code, verifier, nonce } = req.body;
+  const { code, verifier, nonce, redirectUri } = req.body;
 
-  if (!code || !verifier || !nonce) { // <-- 2. Update check
-    return res.status(400).json({ message: 'Code, verifier, and nonce are required.' });
+  if (!code || !verifier || !nonce || !redirectUri) { // <-- 2. Update check
+    return res.status(400).json({ message: 'Code, verifier, nonce, and redirectUri are required.' });
   }
 
   try {
@@ -90,7 +90,7 @@ app.post('/auth/google', googleAuthValidation, async (req, res) => {
         code: code,
         code_verifier: verifier,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+        redirect_uri: redirectUri,
       },
     });
 
@@ -197,10 +197,10 @@ app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { code, state, nonce } = req.body;
+  const { code, state, nonce, redirectUri } = req.body;
 
-  if (!code || !state || !nonce) {
-    return res.status(400).json({ message: 'Code, state, and nonce are required.' });
+  if (!code || !state || !nonce || !redirectUri) {
+    return res.status(400).json({ message: 'Code, state, nonce, and redirectUri are required.' });
   }
 
   try {
@@ -210,7 +210,7 @@ app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
         client_id: process.env.FACEBOOK_CLIENT_ID,
         client_secret: process.env.FACEBOOK_CLIENT_SECRET,
         code: code,
-        redirect_uri: process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+        redirect_uri: redirectUri,
       },
     });
 
