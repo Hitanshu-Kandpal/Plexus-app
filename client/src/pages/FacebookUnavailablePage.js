@@ -5,7 +5,6 @@ import {
   Container,
   Typography,
   Button,
-  useTheme as useMUITheme,
   Fade,
   Grow,
 } from '@mui/material';
