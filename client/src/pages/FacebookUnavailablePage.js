@@ -6,7 +6,6 @@ import {
   Typography,
   Button,
   useTheme as useMUITheme,
-  alpha,
   Fade,
   Grow,
 } from '@mui/material';
@@ -27,17 +26,6 @@ const float = keyframes`
   66% {
     transform: translate(-20px, 20px) scale(0.8);
     opacity: 0.4;
-  }
-`;
-
-const sparkle = keyframes`
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
   }
 `;
 
@@ -189,7 +177,6 @@ const GlowButton = styled(Button)(({ theme }) => ({
 
 const FacebookUnavailablePage = () => {
   const navigate = useNavigate();
-  const theme = useMUITheme();
   const { mode } = useTheme();
   const [particles, setParticles] = useState([]);
 

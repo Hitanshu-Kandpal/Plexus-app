@@ -8,7 +8,6 @@ import {
   Container,
   Typography,
   useTheme as useMUITheme,
-  alpha,
   Fade,
   Grow,
 } from '@mui/material';

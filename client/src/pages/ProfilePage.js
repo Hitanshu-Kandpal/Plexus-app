@@ -14,7 +14,6 @@ import {
   Avatar,
   Chip,
   useTheme as useMUITheme,
-  alpha,
   Fade,
   Grid,
   Divider,
@@ -241,7 +240,7 @@ const ProfilePage = () => {
 
     try {
       setUnlinking(true);
-      const res = await axiosPrivate.post(
+      await axiosPrivate.post(
         '/api/user/unlink-provider',
         { provider: unlinkDialog.provider },
         { headers: { 'CSRF-Token': csrfToken } }

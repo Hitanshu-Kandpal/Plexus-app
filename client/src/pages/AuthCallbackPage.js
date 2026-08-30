@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import {
   Box,
   Typography,
@@ -9,10 +8,8 @@ import {
   Alert,
   Container,
   useTheme as useMUITheme,
-  alpha,
   Fade,
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { styled } from '@mui/material/styles';
 
@@ -34,7 +31,6 @@ const LoadingCard = styled(Box)(({ theme }) => ({
 
 const AuthCallbackPage = () => {
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -117,7 +113,6 @@ const AuthCallbackPage = () => {
       } catch (err) {
         console.error(err);
         setError(err.message);
-        setLoading(false);
         localStorage.removeItem('pkce_code_verifier');
         sessionStorage.removeItem('oauth_state');
         sessionStorage.removeItem('oauth_nonce');
