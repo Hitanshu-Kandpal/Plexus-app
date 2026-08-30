@@ -25,7 +25,7 @@ Express Auth Server
         ↓
 MongoDB (User + Providers)
         ↓
-Recommender Microservice 🔥
+Recommender Route 🔥
  TMDB / Spotify / Books API + Gemini AI
         ↓
 Supabase (Analytics + Search Logs)
@@ -94,7 +94,7 @@ Login	Dashboard	Recommendations	Admin
 REACT_APP_GOOGLE_CLIENT_ID=xxx
 REACT_APP_FACEBOOK_CLIENT_ID=xxx
 
-2️⃣ Server Env (server/.env)
+2️⃣ Backend Env (api/.env)
 MONGO_URI=xxxx
 GOOGLE_CLIENT_ID=xxxx
 GOOGLE_CLIENT_SECRET=xxxx
@@ -102,27 +102,17 @@ FACEBOOK_CLIENT_ID=xxxx
 FACEBOOK_CLIENT_SECRET=xxxx
 JWT_ACCESS_SECRET=xxxx
 JWT_REFRESH_SECRET=xxxx
-
-3️⃣ Recommender Env
 SUPABASE_URL=xxxx
 SUPABASE_SERVICE_KEY=xxxx
 GEMINI_API_KEY=xxxx
 
 <br/>
 🧪 Run Locally
-# Frontend
-cd client
-npm install
-npm start
-
-# Backend
-cd server
-npm install
+# Development (Starts both Frontend and Backend concurrently)
 npm run dev
 
-# Recommender
-cd plexus-recommender-hub/server
-npm install
+# Production
+npm run build
 npm start
 
 <br/>

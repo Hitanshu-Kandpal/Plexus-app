@@ -21,6 +21,7 @@ import AdminPage from './pages/AdminPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import FacebookUnavailablePage from './pages/FacebookUnavailablePage';
 import ProtectedRoute from './components/ProtectedRoute';
+import PersistLogin from './components/PersistLogin';
 import NeonGrid from './components/NeonGrid';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -176,47 +177,49 @@ function App() {
           position: 'relative',
         }}
       >
-        <NeonGrid />
-        <Navbar />
-        <Container
-          component="main"
-          maxWidth={false}
-          sx={{
-            minHeight: 'calc(100vh - 64px)',
-            pt: { xs: 2, sm: 3 },
-            pb: 4,
-          }}
-        >
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/facebook-unavailable" element={<FacebookUnavailablePage />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/recommendations"
-              element={
-                <ProtectedRoute>
-                  <RecommendationsPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Container>
+        <PersistLogin>
+          <NeonGrid />
+          <Navbar />
+          <Container
+            component="main"
+            maxWidth={false}
+            sx={{
+              minHeight: 'calc(100vh - 64px)',
+              pt: { xs: 2, sm: 3 },
+              pb: 4,
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
+              <Route path="/facebook-unavailable" element={<FacebookUnavailablePage />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/recommendations"
+                element={
+                  <ProtectedRoute>
+                    <RecommendationsPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Container>
+        </PersistLogin>
       </Box>
     </BrowserRouter>
   );

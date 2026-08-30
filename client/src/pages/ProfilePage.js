@@ -214,7 +214,7 @@ const ProfilePage = () => {
 
   const handleLogout = async () => {
     try {
-      await axiosPrivate.post('/auth/logout',
+      await axiosPrivate.post('/api/auth/logout',
         {},
         { headers: { 'CSRF-Token': csrfToken } }
       );

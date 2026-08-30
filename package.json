@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "description": "PLEXUS MERN OAuth2 Social Login System",
   "scripts": {
+    "start": "node api/index.js",
+    "dev": "concurrently \"npm start --prefix client\" \"npm run dev --prefix api\"",
     "build": "cd client && npm install && npm run build && cd .. && node -e \"const fs = require('fs'); fs.rmSync('build', {recursive:true, force:true}); fs.cpSync('client/build', 'build', {recursive:true});\""
   },
   "engines": {
     "node": "22.x"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
 

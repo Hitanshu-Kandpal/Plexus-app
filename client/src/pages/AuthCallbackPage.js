@@ -80,7 +80,7 @@ const AuthCallbackPage = () => {
           localStorage.removeItem('pkce_code_verifier');
 
           const apiUrl = process.env.NODE_ENV === 'production' ? '/api' : (process.env.REACT_APP_API_URL || 'http://localhost:5000');
-          res = await fetch(`${apiUrl}/auth/google`, {
+          res = await fetch(`${apiUrl}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: code, verifier: verifier, nonce: savedNonce, redirectUri: window.location.origin + '/auth/callback' }),
@@ -89,7 +89,7 @@ const AuthCallbackPage = () => {
         } else if (provider === 'facebook') {
           // Facebook OAuth (no PKCE, uses state + nonce)
           const apiUrl = process.env.NODE_ENV === 'production' ? '/api' : (process.env.REACT_APP_API_URL || 'http://localhost:5000');
-          res = await fetch(`${apiUrl}/auth/facebook`, {
+          res = await fetch(`${apiUrl}/api/auth/facebook`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: code, state: state, nonce: savedNonce, redirectUri: window.location.origin + '/auth/callback' }),

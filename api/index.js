@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
-dotenv.config(); // Must be at the very top
+const path = require('path');
+dotenv.config({ path: path.join(__dirname, '.env') }); // Must be at the very top
 const dns = require('node:dns');
 dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent ETIMEDOUT on IPv6 addresses
 
@@ -30,14 +31,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 
-// Vercel routes everything in the api folder to /api/*
-// This middleware strips the /api prefix so our existing routes work seamlessly
-app.use((req, res, next) => {
-  if (req.url.startsWith('/api')) {
-    req.url = req.url.substring(4) || '/';
-  }
-  next();
-});
+
 // --- Removed passport.initialize() ---
 
 // General rate limiter for most routes
@@ -78,7 +72,7 @@ const googleAuthValidation = [
   body('nonce').notEmpty().isString().withMessage('Nonce must be a non-empty string') // <-- ADD THIS
 ];
 
-app.post('/auth/google', googleAuthValidation, async (req, res) => {
+app.post('/api/auth/google', googleAuthValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -200,7 +194,7 @@ const facebookAuthValidation = [
   body('nonce').notEmpty().isString().withMessage('Nonce must be a non-empty string')
 ];
 
-app.post('/auth/facebook', facebookAuthValidation, async (req, res) => {
+app.post('/api/auth/facebook', facebookAuthValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -370,7 +364,7 @@ app.get('/api/user/me', protect, async (req, res) => {
 // ===================================
 // This route is protected by CSRF but not 'protect'
 // It does its own JWT verification.
-app.post('/auth/refresh', authLimiter, (req, res) => {
+app.get('/api/auth/refresh', authLimiter, (req, res) => {
   // 1. Get the refresh token from the httpOnly cookie
   const refreshToken = req.cookies.refreshToken;
 
@@ -426,7 +420,7 @@ app.get('/api/admin/users', protect, admin, async (req, res) => {
 });
 
 // --- 5. The "Logout" Route ---
-app.post('/auth/logout', authLimiter, protect, (req, res) => {
+app.post('/api/auth/logout', authLimiter, protect, (req, res) => {
   const isProd = process.env.NODE_ENV === 'production';
   res.clearCookie('refreshToken', {
     httpOnly: true,
@@ -488,11 +482,21 @@ app.post('/api/user/unlink-provider', authLimiter, protect, async (req, res) => 
 });
 
 
-// Start the server (or export for serverless)
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// ===================================
+// ===   PRODUCTION STATIC BUILD   ===
+// ===================================
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../build')));
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }
+
+// Start the server (or export for serverless)
+// In our unified architecture, we always want to start the server.
+// Let's remove the conditional so it runs locally and in prod.
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 module.exports = app;

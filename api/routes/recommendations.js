@@ -40,7 +40,7 @@ async function getSpotifyToken() {
 // 🧠 Gemini insight generator
 async function getGeminiInsight(promptText) {
   const GEMINI_KEY = process.env.GEMINI_API_KEY;
-  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent';
+  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent';
 
   const prompt = {
     contents: [{ parts: [{ text: promptText }] }],
@@ -88,23 +88,49 @@ router.post('/', async (req, res) => {
       const TMDB_KEY = process.env.TMDB_API_KEY;
       const SEARCH_URL = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&include_adult=false`;
 
-      const searchRes = await axios.get(SEARCH_URL);
-      if (!searchRes.data.results?.length) {
-        await saveHistory('No movies found.');
-        return res.json({ category, query, recommendations: [], aiInsight: 'No movies found.' });
+      let recs = [];
+      let aiInsight = '';
+
+      try {
+        // Add a strict 4-second timeout so we don't hang if TMDB is blocked
+        const searchRes = await axios.get(SEARCH_URL, { timeout: 4000 });
+        
+        if (!searchRes.data.results?.length) {
+          await saveHistory('No movies found.');
+          return res.json({ category, query, recommendations: [], aiInsight: 'No movies found.' });
+        }
+
+        const movieId = searchRes.data.results[0].id;
+        const RECS_URL = `https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`;
+        const recsRes = await axios.get(RECS_URL, { timeout: 4000 });
+        
+        recs = recsRes.data.results.slice(0, 8).map(m => ({
+          title: m.title,
+          image: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+          meta: `⭐ ${m.vote_average != null ? m.vote_average.toFixed(1) : 'N/A'} | 📅 ${m.release_date || 'Unknown'}`,
+        }));
+      } catch (tmdbError) {
+        console.warn("⚠️ TMDB request failed/blocked. Falling back to Gemini AI for recommendations.");
+        
+        // --- GEMINI FALLBACK ---
+        try {
+          const fallbackPrompt = `Provide 8 movie recommendations related to "${query}". Return ONLY a raw JSON array of objects, with no markdown formatting. Each object must have keys "title" (string) and "meta" (string, e.g. "⭐ 8.5 | 📅 2010").`;
+          const fallbackRes = await getGeminiInsight(fallbackPrompt);
+          
+          // Clean the response of any potential markdown block wrappers
+          const cleanJsonStr = fallbackRes.replace(/```json/g, '').replace(/```/g, '').trim();
+          const parsedRecs = JSON.parse(cleanJsonStr);
+          
+          recs = parsedRecs.map(m => ({ title: m.title, image: null, meta: m.meta }));
+        } catch (geminiError) {
+          console.error("Gemini fallback also failed:", geminiError);
+          await saveHistory('No movies found.');
+          return res.json({ category, query, recommendations: [], aiInsight: 'Error fetching movies.' });
+        }
       }
 
-      const movieId = searchRes.data.results[0].id;
-      const RECS_URL = `https://api.themoviedb.org/3/movie/${movieId}/recommendations?api_key=${TMDB_KEY}`;
-
-      const recsRes = await axios.get(RECS_URL);
-      const recs = recsRes.data.results.slice(0, 8).map(m => ({
-        title: m.title,
-        image: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
-        meta: `⭐ ${m.vote_average != null ? m.vote_average.toFixed(1) : 'N/A'} | 📅 ${m.release_date || 'Unknown'}`,
-      }));
-
-      const aiInsight = await getGeminiInsight(
+      // Generate the insight using the existing logic (works regardless of TMDB success/failure)
+      aiInsight = await getGeminiInsight(
         `Write a 60-word engaging movie insight for "${query}". Mention its storytelling, tone, and what makes it special. Avoid spoilers.`
       );
       
@@ -233,7 +259,7 @@ router.post('/', async (req, res) => {
 
     // 📚 BOOKS
     if (category === 'book') {
-      const BOOKS_URL = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8`;
+      const BOOKS_URL = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=${process.env.GOOGLE_BOOKS_API_KEY}&maxResults=8`;
       const searchRes = await axios.get(BOOKS_URL);
 
       if (!searchRes.data.items?.length) {

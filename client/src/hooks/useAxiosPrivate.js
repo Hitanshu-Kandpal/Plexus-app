@@ -37,9 +37,10 @@ const useAxiosPrivate = () => {
           try {
             // --- 3. Call the Refresh Endpoint ---
             // We use the "public" axios instance for this
-            // We need to get the new CSRF token from the refresh response
-            const refreshResponse = await axiosPublic.post('/auth/refresh');
+            // because our private instance would be stuck in an infinite loop
+            const refreshResponse = await axiosPublic.get('/api/auth/refresh');
             
+            // 2. Extract the new access token = refreshResponse.data.accessToken;
             const newAccessToken = refreshResponse.data.accessToken;
             const newCsrfToken = refreshResponse.data.csrfToken;
 
